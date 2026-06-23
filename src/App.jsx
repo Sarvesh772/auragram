@@ -40,7 +40,7 @@ function App() {
     Prism.highlightAll();
   }, [posts, loading, activeCommentPostId, postComments]);
 
-  // Session Checker & Initial Fetch
+  // Session Checker, Initial Fetch & REAL-TIME LISTENERS
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
@@ -64,7 +64,34 @@ function App() {
     const savedLikes = JSON.parse(localStorage.getItem('auragram_liked_posts')) || [];
     setLikedPosts(savedLikes);
 
-    return () => subscription.unsubscribe();
+    // 🔥 REAL-TIME ENGINE FOR POSTS
+    const postsChannel = supabase
+      .channel('realtime-posts-feed')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'posts' },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            setPosts((prevPosts) => {
+              const exists = prevPosts.some(p => p.id === payload.new.id);
+              if (exists) return prevPosts;
+              return [payload.new, ...prevPosts];
+            });
+          } else if (payload.eventType === 'UPDATE') {
+            setPosts((prevPosts) =>
+              prevPosts.map((post) => (post.id === payload.new.id ? payload.new : post))
+            );
+          } else if (payload.eventType === 'DELETE') {
+            setPosts((prevPosts) => prevPosts.filter((post) => post.id !== payload.old.id));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+      supabase.removeChannel(postsChannel);
+    };
   }, []);
 
   // Fetch All Posts
@@ -130,14 +157,12 @@ function App() {
     if (error) {
       alert("Comment save nahi ho paya: " + error.message);
     } else if (data && data.length > 0) {
-      // Local state update code
       const currentPostComments = postComments[postId] || [];
       setPostComments({
         ...postComments,
         [postId]: [...currentPostComments, data[0]]
       });
 
-      // Update total comment count inside the posts UI state & DB
       const targetPost = posts.find(p => p.id === postId);
       const updatedCommentCount = (targetPost?.comments || 0) + 1;
       
@@ -212,7 +237,6 @@ function App() {
     const { data, error } = await supabase.from('posts').insert([newPostData]).select();
     if (error) alert("Database error: " + error.message);
     else {
-      if (data && data.length > 0) setPosts([data[0], ...posts]);
       setCaptionInput('');
       setCodeInput('');
     }
@@ -229,7 +253,6 @@ function App() {
     let updatedLikes = hasLiked ? likedPosts.filter(id => id !== postId) : [...likedPosts, postId];
     setLikedPosts(updatedLikes);
     localStorage.setItem('auragram_liked_posts', JSON.stringify(updatedLikes));
-    setPosts(posts.map(post => post.id === postId ? { ...post, likes: newLikesCount } : post));
   };
 
   // Delete Post
@@ -241,7 +264,6 @@ function App() {
 
     const { error } = await supabase.from('posts').delete().eq('id', postId);
     if (error) alert("Delete error: " + error.message);
-    else setPosts(posts.filter(post => post.id !== postId));
   };
 
   return (
