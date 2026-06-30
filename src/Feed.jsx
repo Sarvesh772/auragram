@@ -66,6 +66,7 @@ function Feed({ user, profileMetadata }) {
       username: profileMetadata?.username || user.email.split('@')[0],
       avatar: profileMetadata?.avatar || "✨",
       caption: captionInput,
+      language: "general", // 🔥 Yeh line add ki taaki database ka NOT NULL constraint pass ho jaye!
       likes: 0,
       comments: 0
     };
@@ -75,6 +76,7 @@ function Feed({ user, profileMetadata }) {
     else setCaptionInput('');
   };
 
+  
   const handleLike = async (postId, currentLikes) => {
     const hasLiked = likedPosts.includes(postId);
     let newLikesCount = hasLiked ? Math.max(0, currentLikes - 1) : currentLikes + 1;

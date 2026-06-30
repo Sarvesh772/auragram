@@ -14,12 +14,13 @@ function Feedback({ user, profileMetadata }) {
 
     // Hum feedback ko store karne ke liye messages ya ek dynamic structure insert karenge
     const { error } = await supabase
-      .from('posts') // Abhi ke liye common table schema test pipeline use kar rahe hain
+      .from('posts')
       .insert([
         {
           username: currentUsername,
           avatar: "💬",
           caption: `[SYSTEM FEEDBACK]: ${feedbackText.trim()}`,
+          language: "feedback", // 🔥 Safe step database constraints bypass karne ke liye
           likes: 0,
           comments: 0
         }
@@ -72,5 +73,6 @@ function Feedback({ user, profileMetadata }) {
     </div>
   );
 }
+
 
 export default Feedback;
