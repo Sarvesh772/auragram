@@ -25,7 +25,7 @@ function Settings({ user, profileMetadata }) {
     <div className="max-w-xl mx-auto space-y-6 animate-fadeIn px-1 sm:px-0">
       
       {/* SECTION 1: Account Profile Metadata */}
-      <div className="bg-[#1e293b]/90 backdrop-blur-md rounded-2xl p-6 border border-[#334155] shadow-2xl relative overflow-hidden">
+      <div className="bg-[#162236]/90 backdrop-blur-md rounded-2xl p-4 sm:p-6 border border-slate-700/70 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-cyan-500"></div>
         
         <h3 className="text-sm font-black uppercase tracking-wider text-slate-300 mb-4 pl-1">
@@ -33,25 +33,25 @@ function Settings({ user, profileMetadata }) {
         </h3>
         
         <div className="space-y-3">
-          <div className="bg-[#0f172a] p-3.5 rounded-xl border border-slate-800/80 flex justify-between items-center text-xs">
+          <div className="bg-[#0f172a] p-3.5 rounded-xl border border-slate-800/80 flex flex-col sm:flex-row sm:justify-between gap-1 sm:items-center text-xs">
             <span className="text-slate-400 font-medium">Full Name</span>
             <span className="text-slate-200 font-bold">{profileMetadata?.full_name || 'Auragram Member'}</span>
           </div>
 
-          <div className="bg-[#0f172a] p-3.5 rounded-xl border border-slate-800/80 flex justify-between items-center text-xs">
+          <div className="bg-[#0f172a] p-3.5 rounded-xl border border-slate-800/80 flex flex-col sm:flex-row sm:justify-between gap-1 sm:items-center text-xs">
             <span className="text-slate-400 font-medium">Username</span>
             <span className="text-cyan-400 font-bold">@{currentUsername}</span>
           </div>
 
-          <div className="bg-[#0f172a] p-3.5 rounded-xl border border-slate-800/80 flex justify-between items-center text-xs">
+          <div className="bg-[#0f172a] p-3.5 rounded-xl border border-slate-800/80 flex flex-col sm:flex-row sm:justify-between gap-1 sm:items-center text-xs">
             <span className="text-slate-400 font-medium">Registered Email</span>
-            <span className="text-slate-200 font-mono text-[11px]">{user?.email}</span>
+            <span className="text-slate-200 font-mono text-[11px] break-all">{user?.email}</span>
           </div>
         </div>
       </div>
 
       {/* SECTION 2: Security Crypt Credentials */}
-      <div className="bg-[#1e293b]/90 backdrop-blur-md rounded-2xl p-6 border border-[#334155] shadow-2xl relative overflow-hidden">
+      <div className="bg-[#162236]/90 backdrop-blur-md rounded-2xl p-4 sm:p-6 border border-slate-700/70 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-red-500"></div>
         
         <h3 className="text-sm font-black uppercase tracking-wider text-slate-300 mb-2 pl-1">

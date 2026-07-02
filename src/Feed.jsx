@@ -151,7 +151,7 @@ function Feed({ user, profileMetadata }) {
   const profileAvatar = filteredPosts[0]?.avatar || "✨";
 
   return (
-    <div className="space-y-6 w-full max-w-2xl mx-auto px-1 sm:px-0">
+    <div className="space-y-4 sm:space-y-6 w-full max-w-3xl mx-auto">
       {viewingProfile && (
         <Profile 
           viewingProfile={viewingProfile}
@@ -164,14 +164,14 @@ function Feed({ user, profileMetadata }) {
 
       {/* Premium Dynamic Posting Box */}
       {!viewingProfile && (
-        <div className="bg-[#1e293b]/90 backdrop-blur-md rounded-2xl p-4 sm:p-5 border border-[#334155] shadow-2xl transition-all duration-300">
+        <div className="bg-[#162236]/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-slate-700/70 shadow-xl shadow-black/10 transition-all duration-300">
           <div className="flex gap-3 sm:gap-4 mb-4">
             <div className="w-10 h-10 rounded-full bg-cyan-950 border border-cyan-500/40 flex items-center justify-center shrink-0 shadow-lg text-sm select-none">
               {profileMetadata?.avatar || '✨'}
             </div>
             <textarea 
               placeholder="Kuch naya share karo, bhai! What's on your mind?..." 
-              className="w-full bg-transparent resize-none outline-none text-sm pt-2 text-slate-100 placeholder-slate-500 min-h-[90px] focus:placeholder-slate-400 transition" 
+              className="w-full bg-transparent resize-none outline-none text-sm sm:text-[15px] pt-2 text-slate-100 placeholder-slate-500 min-h-[88px] sm:min-h-[110px] focus:placeholder-slate-400 transition" 
               value={captionInput} 
               onChange={(e) => setCaptionInput(e.target.value)} 
             />
@@ -205,11 +205,11 @@ function Feed({ user, profileMetadata }) {
             return (
               <div 
                 key={post.id} 
-                className="bg-[#1e293b]/90 backdrop-blur-sm rounded-2xl border border-[#334155]/80 overflow-hidden shadow-xl transition-all duration-200 hover:border-slate-500/60"
+                className="bg-[#162236]/90 backdrop-blur-sm rounded-2xl border border-slate-700/70 overflow-hidden shadow-lg shadow-black/10 transition-all duration-200 hover:border-slate-500/70"
               >
                 {/* Post Header */}
-                <div className="p-4 flex justify-between items-center border-b border-[#334155]/40 bg-slate-900/10">
-                  <div className="flex items-center gap-3">
+                <div className="p-3.5 sm:p-4 flex justify-between items-center gap-3 border-b border-[#334155]/40 bg-slate-900/10">
+                  <div className="flex items-center gap-3 min-w-0">
                     <div 
                       onClick={() => setViewingProfile(post.username)} 
                       className="w-9 h-9 rounded-full bg-cyan-950 border border-cyan-500/30 flex items-center justify-center text-sm cursor-pointer hover:scale-105 active:scale-95 transition shadow-sm"
@@ -218,7 +218,7 @@ function Feed({ user, profileMetadata }) {
                     </div>
                     <h3 
                       onClick={() => setViewingProfile(post.username)} 
-                      className="font-bold text-sm text-slate-200 cursor-pointer hover:text-cyan-400 transition"
+                      className="font-bold text-sm text-slate-200 cursor-pointer hover:text-cyan-400 transition truncate"
                     >
                       @{post.username}
                     </h3>
@@ -226,7 +226,7 @@ function Feed({ user, profileMetadata }) {
                   {user && (profileMetadata?.username === post.username || user.email.split('@')[0] === post.username) && (
                     <button 
                       onClick={() => handleDelete(post.id, post.username)} 
-                      className="text-[11px] text-red-400 font-medium bg-red-500/5 px-2.5 py-1 rounded-lg border border-red-500/10 hover:bg-red-500 hover:text-white transition cursor-pointer"
+                      className="shrink-0 text-[10px] sm:text-[11px] text-red-400 font-medium bg-red-500/5 px-2 sm:px-2.5 py-1 rounded-lg border border-red-500/10 hover:bg-red-500 hover:text-white transition cursor-pointer"
                     >
                       🗑️ Delete
                     </button>
@@ -234,14 +234,14 @@ function Feed({ user, profileMetadata }) {
                 </div>
 
                 {/* Post Content */}
-                <div className="p-4 sm:p-5">
-                  <p className="text-sm text-slate-200 whitespace-pre-wrap leading-relaxed tracking-wide font-normal">
+                <div className="p-4 sm:p-5 min-h-20">
+                  <p className="text-sm sm:text-[15px] text-slate-200 whitespace-pre-wrap break-words leading-relaxed font-normal">
                     {post.caption}
                   </p>
                 </div>
 
                 {/* Post Interactivity Footer */}
-                <div className="px-4 py-3 bg-slate-900/30 border-t border-[#334155]/20 flex gap-3 text-xs text-slate-300">
+                <div className="px-3 sm:px-4 py-3 bg-slate-900/30 border-t border-[#334155]/20 flex flex-wrap gap-2 sm:gap-3 text-xs text-slate-300">
                   <button 
                     onClick={() => handleLike(post.id, post.likes)} 
                     className={`flex items-center gap-1.5 transition px-3 py-1.5 rounded-xl font-bold border cursor-pointer active:scale-95 ${
@@ -286,7 +286,7 @@ function Feed({ user, profileMetadata }) {
                     </div>
                     
                     {/* Add Comment Field */}
-                    <form onSubmit={(e) => handleCommentSubmit(e, post.id)} className="flex gap-2 pt-2 border-t border-[#334155]/30">
+                    <form onSubmit={(e) => handleCommentSubmit(e, post.id)} className="flex flex-col sm:flex-row gap-2 pt-2 border-t border-[#334155]/30">
                       <input 
                         type="text" 
                         placeholder="Write a reply..." 
@@ -297,7 +297,7 @@ function Feed({ user, profileMetadata }) {
                       />
                       <button 
                         type="submit" 
-                        className="bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-black px-4 rounded-xl text-xs transition shadow-md cursor-pointer active:scale-95"
+                        className="bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-black px-4 py-2.5 rounded-xl text-xs transition shadow-md cursor-pointer active:scale-95"
                       >
                         Reply
                       </button>

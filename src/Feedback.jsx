@@ -37,7 +37,7 @@ function Feedback({ user, profileMetadata }) {
 
   return (
     <div className="max-w-xl mx-auto space-y-6 animate-fadeIn px-1 sm:px-0">
-      <div className="bg-[#1e293b]/90 backdrop-blur-md rounded-2xl p-6 border border-[#334155] shadow-2xl relative overflow-hidden">
+      <div className="bg-[#162236]/90 backdrop-blur-md rounded-2xl p-4 sm:p-6 border border-slate-700/70 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-purple-500 to-pink-500"></div>
         
         <div className="space-y-2 mb-6">
@@ -59,11 +59,11 @@ function Feedback({ user, profileMetadata }) {
             />
           </div>
 
-          <div className="flex justify-end pt-2">
+          <div className="flex justify-stretch sm:justify-end pt-2">
             <button
               type="submit"
               disabled={submitting || !feedbackText.trim()}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white text-xs font-black px-6 py-2.5 rounded-xl transition duration-200 shadow-lg disabled:opacity-50 cursor-pointer active:scale-95"
+              className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white text-xs font-black px-6 py-2.5 rounded-xl transition duration-200 shadow-lg disabled:opacity-50 cursor-pointer active:scale-95"
             >
               {submitting ? 'Sending Logs... ⏳' : 'Submit Feedback 🚀'}
             </button>

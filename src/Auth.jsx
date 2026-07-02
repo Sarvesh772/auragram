@@ -64,11 +64,11 @@ function Auth({ onAuthSuccess }) {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center min-h-[75vh] mt-4">
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center min-h-[calc(100vh-8rem)] py-4">
       
       {/* LEFT COLUMN: Premium Login/Sign Up Box */}
       <div className="md:col-span-5 w-full max-w-md mx-auto order-2 md:order-1">
-        <div className="bg-[#1e293b]/90 backdrop-blur-md rounded-2xl p-7 border border-[#334155] shadow-2xl transition-all duration-300">
+        <div className="bg-[#162236]/90 backdrop-blur-xl rounded-2xl p-4 sm:p-7 border border-slate-700/70 shadow-2xl transition-all duration-300">
           
           {/* Toggle Tab Navigation */}
           <div className="flex justify-between border-b border-[#334155]/60 pb-3 mb-6 text-sm font-semibold">
@@ -136,12 +136,12 @@ function Auth({ onAuthSuccess }) {
       </div>
 
       {/* RIGHT COLUMN: Premium Trust-Building Copywriting */}
-      <div className="md:col-span-7 space-y-6 lg:pl-10 order-1 md:order-2 text-center md:text-left">
+      <div className="md:col-span-7 space-y-4 sm:space-y-6 lg:pl-10 order-1 md:order-2 text-center md:text-left">
         <div className="inline-flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 px-3 py-1.5 rounded-full text-xs text-cyan-400 font-medium tracking-wide">
           ⚡ Experience Next-Gen Socializing
         </div>
         
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-none">
+        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-[1.05]">
           Connect, Share, and <br/>
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-indigo-400 to-purple-400">
             Build Your Aura.

@@ -18,7 +18,7 @@ function Help() {
 
   return (
     <div className="max-w-xl mx-auto space-y-6 animate-fadeIn px-1 sm:px-0">
-      <div className="bg-[#1e293b]/90 backdrop-blur-md rounded-2xl p-6 border border-[#334155] shadow-2xl relative overflow-hidden">
+      <div className="bg-[#162236]/90 backdrop-blur-md rounded-2xl p-4 sm:p-6 border border-slate-700/70 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-400 to-cyan-500"></div>
         
         <h3 className="text-sm font-black uppercase tracking-wider text-slate-300 mb-2 pl-1">
