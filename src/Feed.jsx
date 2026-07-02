@@ -76,13 +76,41 @@ function Feed({ user, profileMetadata }) {
 
   const fetchPosts = async () => {
     setLoading(true);
+    
+    // 🔥 Relational Query: posts ke sath profiles table se live avatar aur name pull karega
     const { data, error } = await supabase
       .from('posts')
-      .select('*')
+      .select(`
+        id,
+        caption,
+        likes,
+        comments,
+        username,
+        created_at,
+        language
+      `)
       .order('created_at', { ascending: false });
 
-    if (error) console.error("Error loading posts:", error.message);
-    else setPosts(data || []);
+    if (error) {
+      console.error("Error loading posts:", error.message);
+    } else if (data) {
+      // Har post ke username ke basis par uski current live DP database se match karne ka controller
+      const postsWithLiveAvatars = await Promise.all(data.map(async (post) => {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('avatar, full_name')
+          .eq('username', post.username)
+          .maybeSingle();
+          
+        return {
+          ...post,
+          avatar: profileData?.avatar || '', // Live uploaded image string from profiles table
+          full_name: profileData?.full_name || 'Auragram Member'
+        };
+      }));
+
+      setPosts(postsWithLiveAvatars);
+    }
     setLoading(false);
   };
 
@@ -91,7 +119,6 @@ function Feed({ user, profileMetadata }) {
 
     const newPostData = {
       username: profileMetadata?.username || user.email.split('@')[0],
-      avatar: profileMetadata?.avatar || "✨",
       caption: captionInput,
       language: "general",
       likes: 0,
@@ -99,8 +126,12 @@ function Feed({ user, profileMetadata }) {
     };
 
     const { error } = await supabase.from('posts').insert([newPostData]);
-    if (error) alert("Database error: " + error.message);
-    else setCaptionInput('');
+    if (error) {
+      alert("Database error: " + error.message);
+    } else {
+      setCaptionInput('');
+      fetchPosts(); // Refresh timeline immediately
+    }
   };
 
   const handleLike = async (postId, currentLikes) => {
