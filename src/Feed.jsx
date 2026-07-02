@@ -23,6 +23,13 @@ function Feed({ user, profileMetadata }) {
   const [reportReason, setReportReason] = useState('');
   const [reportDetails, setReportDetails] = useState('');
 
+  // Delete confirmation modal states (No browser alerts!)
+  const [deletingPostId, setDeletingPostId] = useState(null);
+  const [isDeletingLoading, setIsDeletingLoading] = useState(false);
+
+  const [reportSuccess, setReportSuccess] = useState(false);
+  const [submittingReport, setSubmittingReport] = useState(false);
+
   // Close 3-Dot menu when clicking anywhere outside
   useEffect(() => {
     function handleClickOutside(event) {
@@ -108,12 +115,21 @@ function Feed({ user, profileMetadata }) {
     localStorage.setItem('auragram_liked_posts', JSON.stringify(updatedLikes));
   };
 
-  const handleDelete = async (postId) => {
-    if (!window.confirm("Sach me ye post delete karni hai?")) return;
-    setActiveMenuPostId(null);
-
-    const { error } = await supabase.from('posts').delete().eq('id', postId);
-    if (error) alert("Delete error: " + error.message);
+  const handleDeleteExecute = async () => {
+    if (!deletingPostId) return;
+    
+    setIsDeletingLoading(true);
+    const { error } = await supabase
+      .from('posts')
+      .delete()
+      .eq('id', deletingPostId);
+      
+    setIsDeletingLoading(false);
+    setDeletingPostId(null);
+    
+    if (error) {
+      alert("Delete karne me dikkat aayi: " + error.message);
+    }
   };
 
   const handleCopyLink = (postId) => {
@@ -141,11 +157,25 @@ function Feed({ user, profileMetadata }) {
     e.preventDefault();
     if (!reportReason) return alert("Please select a reason for reporting!");
 
-    alert(`Report logged successfully!\nPost ID: ${reportingPost.id}\nReason: ${reportReason}\nDetails: ${reportDetails || 'None'}`);
-    
-    setReportingPost(null);
-    setReportReason('');
-    setReportDetails('');
+    setSubmittingReport(true);
+    const { error } = await supabase
+      .from('reports')
+      .insert([
+        {
+          post_id: reportingPost.id,
+          reported_by: profileMetadata?.username || user?.email?.split('@')[0],
+          reason: reportReason,
+          details: reportDetails.trim() || null
+        }
+      ]);
+
+    setSubmittingReport(false);
+
+    if (error) {
+      alert("Report submit nahi ho payi: " + error.message);
+    } else {
+      setReportSuccess(true);
+    }
   };
 
   const toggleCommentsSection = async (postId) => {
@@ -299,7 +329,8 @@ function Feed({ user, profileMetadata }) {
                             <button onClick={() => handleShare(post)} className="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-white flex items-center gap-2 font-semibold">Share</button>
                             <button onClick={() => handleCopyLink(post.id)} className="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-white flex items-center gap-2 font-semibold">Copy Link</button>
                             <div className="border-t border-[#334155]/40 my-1"></div>
-                            <button onClick={() => handleDelete(post.id)} className="w-full text-left px-4 py-2 text-xs text-red-400 hover:bg-red-500/10 hover:text-red-300 flex items-center gap-2 font-black">Delete Post</button>
+                            {/* 🔥 Yeh rahi vahi updated clean state line jo maine integration me fix kar di! */}
+                            <button onClick={() => { setDeletingPostId(post.id); setActiveMenuPostId(null); }} className="w-full text-left px-4 py-2 text-xs text-red-400 hover:bg-red-500/10 hover:text-red-300 flex items-center gap-2 font-black">Delete Post</button>
                           </>
                         ) : (
                           <>
@@ -383,58 +414,125 @@ function Feed({ user, profileMetadata }) {
         )}
       </div>
 
-      {/* REPORT MODAL (Clean Text Only) */}
+      {/* REPORT MODAL */}
       {reportingPost && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="bg-[#1e293b] border border-[#334155] rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
-            <h3 className="text-md font-black text-slate-100 flex items-center gap-2 border-b border-[#334155] pb-3 mb-4">
-              Report Content Publication
-            </h3>
-            
-            <form onSubmit={handleReportSubmit} className="space-y-4">
-              <div>
-                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-2">Why are you reporting this post?</label>
-                <select 
-                  className="w-full bg-[#0f172a] border border-[#334155] p-3 rounded-xl text-xs text-slate-200 outline-none focus:border-amber-500 cursor-pointer"
-                  value={reportReason}
-                  onChange={(e) => setReportReason(e.target.value)}
-                  required
-                >
-                  <option value="">-- Choose a standard reason --</option>
-                  <option value="spam">Spam or misleading posts</option>
-                  <option value="harassment">Hate speech or harassment</option>
-                  <option value="abusive">Abusive or offensive language</option>
-                  <option value="copyright">Intellectual property violation</option>
-                  <option value="other">Other reasons</option>
-                </select>
-              </div>
+            {!reportSuccess ? (
+              <>
+                <h3 className="text-md font-black text-slate-100 flex items-center gap-2 border-b border-[#334155] pb-3 mb-4">
+                  Report Content Publication
+                </h3>
+                
+                <form onSubmit={handleReportSubmit} className="space-y-4">
+                  <div>
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-2">Why are you reporting this post?</label>
+                    <select 
+                      className="w-full bg-[#0f172a] border border-[#334155] p-3 rounded-xl text-xs text-slate-200 outline-none focus:border-amber-500 cursor-pointer"
+                      value={reportReason}
+                      onChange={(e) => setReportReason(e.target.value)}
+                      required
+                      disabled={submittingReport}
+                    >
+                      <option value="">-- Choose a standard reason --</option>
+                      <option value="spam">Spam or misleading posts</option>
+                      <option value="harassment">Hate speech or harassment</option>
+                      <option value="abusive">Abusive or offensive language</option>
+                      <option value="copyright">Intellectual property violation</option>
+                      <option value="other">Other reasons</option>
+                    </select>
+                  </div>
 
-              <div>
-                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-2">Additional Information (Optional)</label>
-                <textarea 
-                  placeholder="Provide any additional context or details here..."
-                  className="w-full bg-[#0f172a] border border-[#334155] p-3 rounded-xl text-xs text-slate-200 outline-none focus:border-amber-500 min-h-[80px] resize-none"
-                  value={reportDetails}
-                  onChange={(e) => setReportDetails(e.target.value)}
-                />
-              </div>
+                  <div>
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-2">Additional Information (Optional)</label>
+                    <textarea 
+                      placeholder="Provide any additional context or details here..."
+                      className="w-full bg-[#0f172a] border border-[#334155] p-3 rounded-xl text-xs text-slate-200 outline-none focus:border-amber-500 min-h-[80px] resize-none"
+                      value={reportDetails}
+                      onChange={(e) => setReportDetails(e.target.value)}
+                      disabled={submittingReport}
+                    />
+                  </div>
 
-              <div className="flex justify-end gap-3 pt-2 border-t border-[#334155]/40">
-                <button 
-                  type="button" 
-                  onClick={() => setReportingPost(null)}
-                  className="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-4 py-2 rounded-xl transition cursor-pointer"
+                  <div className="flex justify-end gap-3 pt-2 border-t border-[#334155]/40">
+                    <button 
+                      type="button" 
+                      onClick={() => { setReportingPost(null); setReportReason(''); setReportDetails(''); }}
+                      className="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-4 py-2 rounded-xl transition cursor-pointer"
+                      disabled={submittingReport}
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      type="submit"
+                      className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 text-xs font-black px-5 py-2.5 rounded-xl transition shadow-lg cursor-pointer disabled:opacity-50"
+                      disabled={submittingReport}
+                    >
+                      {submittingReport ? 'Submitting...' : 'Submit Report'}
+                    </button>
+                  </div>
+                </form>
+              </>
+            ) : (
+              <div className="text-center py-6 space-y-4 animate-fadeIn">
+                <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-400 text-xl font-bold">
+                  ✓
+                </div>
+                <div className="space-y-1">
+                  <h4 className="text-sm font-bold text-slate-100">Report Logged Successfully</h4>
+                  <p className="text-[11px] text-slate-400 max-w-xs mx-auto leading-normal">
+                    Thank you! The post has been securely flagged and logged into the database. Our core audit pipeline will investigate this shortly.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setReportingPost(null);
+                    setReportSuccess(false);
+                    setReportReason('');
+                    setReportDetails('');
+                  }}
+                  className="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-6 py-2 rounded-xl transition cursor-pointer mt-2"
                 >
-                  Cancel
-                </button>
-                <button 
-                  type="submit"
-                  className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 text-xs font-black px-5 py-2.5 rounded-xl transition shadow-lg cursor-pointer"
-                >
-                  Submit Report
+                  Close Window
                 </button>
               </div>
-            </form>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* PREMIUM CUSTOM DELETE MODAL (No Browser Alerts!) */}
+      {deletingPostId && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
+          <div className="bg-[#1e293b] border border-[#334155] rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center space-y-4">
+            <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto text-red-400 text-lg">
+              🗑️
+            </div>
+            <div className="space-y-1">
+              <h4 className="text-sm font-bold text-slate-100">Delete Post</h4>
+              <p className="text-[11px] text-slate-400 max-w-xs mx-auto leading-normal">
+                Sach me ye post delete karni hai? Ek baar delete hone ke baad ise wapas nahi laya ja sakta.
+              </p>
+            </div>
+            <div className="flex justify-center gap-3 pt-2">
+              <button 
+                type="button" 
+                onClick={() => setDeletingPostId(null)}
+                className="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-4 py-2.5 rounded-xl transition cursor-pointer"
+                disabled={isDeletingLoading}
+              >
+                Cancel
+              </button>
+              <button 
+                type="button"
+                onClick={handleDeleteExecute}
+                className="bg-red-500 hover:bg-red-600 text-white text-xs font-black px-5 py-2.5 rounded-xl transition shadow-lg cursor-pointer disabled:opacity-50"
+                disabled={isDeletingLoading}
+              >
+                {isDeletingLoading ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
           </div>
         </div>
       )}
