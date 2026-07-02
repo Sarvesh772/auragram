@@ -2,11 +2,11 @@ import React from 'react';
 
 function Sidebar({ currentTab, setCurrentTab, userProfile, onLogout }) {
   const menuItems = [
-    { id: 'feed', label: 'Home Feed', shortLabel: '🏠' },
-    { id: 'profile', label: 'Your Profile', shortLabel: '👑' },
-    { id: 'settings', label: 'Settings', shortLabel: '⚙️' },
-    { id: 'feedback', label: 'Feedback', shortLabel: '💬' },
-    { id: 'help', label: 'Help & Support', shortLabel: '❓' }
+    { id: 'feed', label: '🏠 Home Feed', shortLabel: '🏠' },
+    { id: 'profile', label: '👑 Your Profile', shortLabel: '👑' },
+    { id: 'settings', label: '⚙️ Settings', shortLabel: '⚙️' },
+    { id: 'feedback', label: '💬 Feedback', shortLabel: '💬' },
+    { id: 'help', label: '❓ Help & Support', shortLabel: '❓' }
   ];
 
   return (
@@ -49,7 +49,7 @@ function Sidebar({ currentTab, setCurrentTab, userProfile, onLogout }) {
           onClick={onLogout}
           className="w-full bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-extrabold py-3 rounded-xl hover:bg-red-500 hover:text-white transition-all duration-200 cursor-pointer shadow-md"
         >
-          Logout Account
+          Logout Account 🔒
         </button>
       </div>
 
