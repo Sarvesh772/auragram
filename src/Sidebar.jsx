@@ -1,17 +1,18 @@
 import React from 'react';
 
 function Sidebar({ currentTab, setCurrentTab, userProfile, onLogout }) {
+  // Desktop ke liye saaf text, mobile ke liye premium minimal emojis
   const menuItems = [
-    { id: 'feed', label: '🏠 Home Feed', shortLabel: '🏠' },
-    { id: 'profile', label: '👑 Your Profile', shortLabel: '👑' },
-    { id: 'settings', label: '⚙️ Settings', shortLabel: '⚙️' },
-    { id: 'feedback', label: '💬 Feedback', shortLabel: '💬' },
-    { id: 'help', label: '❓ Help & Support', shortLabel: '❓' }
+    { id: 'feed', label: 'Home Feed', mobileEmoji: '🏠' },
+    { id: 'profile', label: 'Your Profile', mobileEmoji: '👑' },
+    { id: 'settings', label: 'Settings', mobileEmoji: '⚙️' },
+    { id: 'feedback', label: 'Feedback', mobileEmoji: '💬' },
+    { id: 'help', label: 'Help & Support', mobileEmoji: '❓' }
   ];
 
   return (
     <>
-      {/* 🖥️ DESKTOP & TABLET SIDEBAR: Fixed at Left Edge */}
+      {/* 🖥️ DESKTOP & TABLET SIDEBAR: Edge Fixed & Emoji-Free Clean Look */}
       <div className="hidden md:flex flex-col bg-[#1e293b] border-r border-[#334155] w-64 h-screen fixed top-0 left-0 pt-20 px-4 pb-6 justify-between z-40 shadow-2xl">
         
         <div className="space-y-6">
@@ -26,13 +27,13 @@ function Sidebar({ currentTab, setCurrentTab, userProfile, onLogout }) {
             </div>
           </div>
 
-          {/* Nav Actions */}
+          {/* Nav Actions (Laptop view: Plain professional text, NO EMOJIS) */}
           <nav className="flex flex-col gap-1.5">
             {menuItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => setCurrentTab(item.id)}
-                className={`w-full text-left text-xs font-bold px-4 py-3.5 rounded-xl transition-all duration-200 cursor-pointer active:scale-[0.98] ${
+                className={`w-full text-left text-xs font-bold px-5 py-3.5 rounded-xl transition-all duration-200 cursor-pointer active:scale-[0.98] ${
                   currentTab === item.id
                     ? 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-slate-950 shadow-lg shadow-cyan-500/10'
                     : 'text-slate-300 hover:bg-[#0f172a] hover:text-cyan-400'
@@ -53,20 +54,19 @@ function Sidebar({ currentTab, setCurrentTab, userProfile, onLogout }) {
         </button>
       </div>
 
-      {/* 📱 MOBILE VIEW COMPACT BOTTOM NAVIGATION BAR: Instantly adapts to smaller displays */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#1e293b]/95 backdrop-blur-md border-t border-[#334155] flex justify-around items-center py-2 px-2 z-50 shadow-2xl">
+      {/* 📱 MOBILE VIEW COMPACT BOTTOM NAVIGATION BAR: Emojis only, no text below them */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#1e293b]/95 backdrop-blur-md border-t border-[#334155] flex justify-around items-center py-3.5 px-2 z-50 shadow-2xl">
         {menuItems.map((item) => (
           <button
             key={item.id}
             onClick={() => setCurrentTab(item.id)}
-            className={`flex flex-col items-center justify-center p-2 rounded-xl text-[10px] font-bold transition-all duration-150 ${
+            className={`flex items-center justify-center p-2.5 rounded-xl text-xl transition-all duration-150 cursor-pointer ${
               currentTab === item.id 
-                ? 'text-cyan-400 scale-105 bg-[#0f172a]/60 px-3' 
-                : 'text-slate-400'
+                ? 'bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 scale-110 px-4' 
+                : 'opacity-60 grayscale-[30%] text-slate-400'
             }`}
           >
-            <span className="text-lg mb-0.5">{item.shortLabel}</span>
-            <span className="scale-90 font-medium">{item.label.split(' ')[1]}</span>
+            <span className="select-none active:scale-95 transition-transform block">{item.mobileEmoji}</span>
           </button>
         ))}
       </div>
